@@ -118,14 +118,13 @@
     const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
 
     
-    nameInputElement.value.trim()
-    if (nameInputElement.value === "" || nameInputElement.value === " ") {
+    if (nameInputElement.value.trim() === "" || nameInputElement.value.trim() === " ") {
       nameInputElement.classList.add("error");
       return;
     } else {
       nameInputElement.classList.remove("error");
     }
-    if (textInputElement.value === "" || textInputElement.value === " ") {
+    if (textInputElement.value.trim() === "" || textInputElement.value.trim() === " ") {
       textInputElement.classList.add("error");
       return;
     } else {

@@ -76,7 +76,9 @@
     for (const commentElement of commentsElements) {
       commentElement.addEventListener('click', () => {
         const index = commentElement.dataset.index
-        const quotText = `${comments[index].text} ${comments[index].name}`
+        const quotText =
+          `> ${comments[index].text} 
+${comments[index].name},`
         const textArea = document.querySelector('.add-form-text')
         textArea.value = quotText
       })
@@ -86,9 +88,13 @@
   function initEventListener() {
     const likeButtonElements = document.querySelectorAll('.like-button');
     for (const likeButtonElement of likeButtonElements) {
-      likeButtonElement.addEventListener('click', () => {
+      likeButtonElement.addEventListener('click', (event) => {
+
         const index = likeButtonElement.dataset.index;
         const element = comments[index];
+
+        event.stopPropagation();
+
         if (element.isLiked) {
           element.isLiked = !element.isLiked
           element.likeCount--
@@ -103,7 +109,15 @@
   };
 
 
-
+  buttonElement.disabled = true;
+  nameInputElement.addEventListener('input', () => {
+    if (nameInputElement.value === "") {
+      buttonElement.disabled = true;
+      return;
+    } else {
+      buttonElement.disabled = false;
+    }
+  })
 
 
   buttonElement.addEventListener("click", () => {
@@ -117,13 +131,13 @@
     const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
 
 
-    if (nameInputElement.value.trim() === "" || nameInputElement.value.trim() === " ") {
+    if (nameInputElement.value.trim() === "") {
       nameInputElement.classList.add("error");
       return;
     } else {
       nameInputElement.classList.remove("error");
     }
-    if (textInputElement.value.trim() === "" || textInputElement.value.trim() === " ") {
+    if (textInputElement.value.trim() === "") {
       textInputElement.classList.add("error");
       return;
     } else {
@@ -132,9 +146,17 @@
 
     comments.push(
       {
-        name: nameInputElement.value,
+        name: nameInputElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
         date: formattedDate,
-        text: textInputElement.value,
+        text: textInputElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
         isLiked: false,
         likeCount: 0,
       });
@@ -143,6 +165,7 @@
 
     nameInputElement.value = "";
     textInputElement.value = "";
+    buttonElement.disabled = true;
   });
 
   renderComments();

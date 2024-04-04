@@ -29,21 +29,19 @@
   const textInputElement = document.getElementById('text-input');
   const listElement = document.getElementById('list');
 
-
-  const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
-    method: "GET"
-  });
-
-  fetchPromise.then((response) => {
-    const jsonPromise = response.json();
-
-    jsonPromise.then((responseData) => {
-
-      comments = responseData.comments;
-
-      renderComments()
+  const fetchAndRenderComments = () => {
+    return fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
+      method: "GET"
     })
-  });
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        comments = responseData.comments;
+        renderComments()
+      });
+  };
+
 
 
   let comments = [];
@@ -122,7 +120,7 @@ ${comments[index].author.name},`
 
   buttonElement.addEventListener("click", () => {
 
-    const currentDate = new Date();
+    const currentDate = new Date;
     const day = currentDate.getDate().toString().padStart(2, '0');
     const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
     const year = currentDate.getFullYear().toString().slice(-2);
@@ -144,22 +142,7 @@ ${comments[index].author.name},`
       textInputElement.classList.remove("error");
     };
 
-    // comments.push(
-    //   {
-    //     name: nameInputElement.value
-    //       .replaceAll("&", "&amp;")
-    //       .replaceAll("<", "&lt;")
-    //       .replaceAll(">", "&gt;")
-    //       .replaceAll('"', "&quot;"),
-    //     date: formattedDate,
-    //     text: textInputElement.value
-    //       .replaceAll("&", "&amp;")
-    //       .replaceAll("<", "&lt;")
-    //       .replaceAll(">", "&gt;")
-    //       .replaceAll('"', "&quot;"),
-    //     isLiked: false,
-    //     likes: 0,
-    //   });
+    buttonElement.textContent = 'Комментарий добавляется...';
 
     fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
       method: "POST",
@@ -175,13 +158,17 @@ ${comments[index].author.name},`
           .replaceAll(">", "&gt;")
           .replaceAll('"', "&quot;"),
       }),
-
-    }).then((response) => {
-      response.json().then((responseData) => {
-        comments = responseData.comments;
-        renderComments()
+    })
+      .then((response) => {
+        return response.json();
       })
-    });
+      .then(() => {
+        return fetchAndRenderComments();
+      })
+      .then(() => {
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Написать';
+      });
 
     renderComments();
 
@@ -190,6 +177,7 @@ ${comments[index].author.name},`
     buttonElement.disabled = true;
   });
 
+  fetchAndRenderComments();
   renderComments();
 
 

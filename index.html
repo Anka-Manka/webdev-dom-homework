@@ -30,20 +30,18 @@
   const listElement = document.getElementById('list');
 
 
-  const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
-    method: "GET"
-  });
-
-  fetchPromise.then((response) => {
-    const jsonPromise = response.json();
-
-    jsonPromise.then((responseData) => {
-
-      comments = responseData.comments;
-
-      renderComments()
+  const fetchAndRenderComments = () => {
+    return fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
+      method: "GET"
     })
-  });
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        comments = responseData.comments;
+        renderComments()
+      });
+  };
 
 
   let comments = [];
@@ -175,22 +173,21 @@ ${comments[index].author.name},`
           .replaceAll(">", "&gt;")
           .replaceAll('"', "&quot;"),
       }),
-
-    }).then((response) => {
-      response.json().then((responseData) => {
-        comments = responseData.comments;
-        renderComments()
+    })
+      .then((response) => {
+        return response.json();
       })
-    });
+      .then(() => {
+        return fetchAndRenderComments();
+      });
 
     renderComments();
 
     nameInputElement.value = "";
     textInputElement.value = "";
-    buttonElement.disabled = true;
   });
 
-  renderComments();
+  fetchAndRenderComments();
 
 
 

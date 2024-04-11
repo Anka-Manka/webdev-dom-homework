@@ -9,14 +9,19 @@
 
 <body>
   <div class="container">
+    <div id="loading" style="display: none;">
+      Загружаем комментарии...
+    </div>
     <ul id="list" class="comments">
       <!-- Код из JS -->
     </ul>
+    <div id="loading-message" style="display: none;">Добавляем комментарий...</div>
     <div class="add-form">
       <input id="name-input" type="text" class="add-form-name" placeholder="Введите ваше имя" />
       <textarea id="text-input" type="textarea" class="add-form-text" placeholder="Введите ваш коментарий"
         rows="4"></textarea>
       <div class="add-form-row">
+        <button id="delete-button" class="delete-comment">Удалить</button>
         <button id="add-button" class="add-form-button">Написать</button>
       </div>
     </div>
@@ -28,9 +33,12 @@
   const nameInputElement = document.getElementById('name-input');
   const textInputElement = document.getElementById('text-input');
   const listElement = document.getElementById('list');
+  const deleteLastComment = document.querySelector('.delete-comment')
 
 
   const fetchAndRenderComments = () => {
+    const loadingElement = document.getElementById('loading');
+    loadingElement.style.display = 'block';
     return fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
       method: "GET"
     })
@@ -39,7 +47,8 @@
       })
       .then((responseData) => {
         comments = responseData.comments;
-        renderComments()
+        renderComments();
+        loadingElement.style.display = 'none';
       });
   };
 
@@ -142,22 +151,11 @@ ${comments[index].author.name},`
       textInputElement.classList.remove("error");
     };
 
-    // comments.push(
-    //   {
-    //     name: nameInputElement.value
-    //       .replaceAll("&", "&amp;")
-    //       .replaceAll("<", "&lt;")
-    //       .replaceAll(">", "&gt;")
-    //       .replaceAll('"', "&quot;"),
-    //     date: formattedDate,
-    //     text: textInputElement.value
-    //       .replaceAll("&", "&amp;")
-    //       .replaceAll("<", "&lt;")
-    //       .replaceAll(">", "&gt;")
-    //       .replaceAll('"', "&quot;"),
-    //     isLiked: false,
-    //     likes: 0,
-    //   });
+    const loadingMessageElement = document.getElementById('loading-message');
+    loadingMessageElement.style.display = 'block';
+
+    const commentFormDisable = document.querySelector('.add-form');
+    commentFormDisable.style.display = 'none';
 
     fetch("https://wedev-api.sky.pro/api/v1/ann-ryzhkova/comments", {
       method: "POST",
@@ -179,6 +177,12 @@ ${comments[index].author.name},`
       })
       .then(() => {
         return fetchAndRenderComments();
+      })
+      .then(() => {
+        commentFormDisable.style.display = 'flex';
+        loadingMessageElement.style.display = 'none';
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Написать';
       });
 
     renderComments();
@@ -187,7 +191,15 @@ ${comments[index].author.name},`
     textInputElement.value = "";
   });
 
+  deleteLastComment.addEventListener('click', () => {
+    if (comments.length > 0) {
+      comments.pop();
+      renderComments();
+    }
+  });
+
   fetchAndRenderComments();
+  renderComments();
 
 
 

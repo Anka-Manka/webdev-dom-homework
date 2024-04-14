@@ -173,22 +173,40 @@ ${comments[index].author.name},`
       }),
     })
       .then((response) => {
+        if (!response.ok) {
+          if (response.status === 400) {
+            alert('Имя и комментарий должны быть не короче 3 символов');
+          } else if (response.status === 500) {
+            alert('Сервер сломался, попробуй позже.');
+          }
+          throw new Error('Ответ сервера не был успешным')
+        }
         return response.json();
       })
       .then(() => {
         return fetchAndRenderComments();
       })
       .then(() => {
+        nameInputElement.value = "";
+        textInputElement.value = "";
+      })
+      .catch((error) => {
+        if (error.message !== 'Ответ сервера не был успешным') {
+          console.error('Возникла проблема с  операцией fetch: ', error)
+          alert('Отсутствует соединение с Интернетом, попробуйте позже')
+        };
+      })
+      .finally(() => {
         commentFormDisable.style.display = 'flex';
         loadingMessageElement.style.display = 'none';
         buttonElement.disabled = false;
         buttonElement.textContent = 'Написать';
       });
 
-    renderComments();
 
-    nameInputElement.value = "";
-    textInputElement.value = "";
+
+    buttonElement.disabled = true;
+
   });
 
   deleteLastComment.addEventListener('click', () => {
